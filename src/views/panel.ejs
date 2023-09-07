@@ -91,7 +91,7 @@
                 formData.append('files', file.files[i]);
             }
             document.getElementById('stat').innerHTML = `Uploading...`;
-            window.uploadProg = 0;
+            window.uploadProg = 1;
             // set interval to update progress in seconds
             window.uploadInterval = setInterval(() => {
                 document.getElementById('stat').innerHTML = `Uploading... ${window.uploadProg++}`;
