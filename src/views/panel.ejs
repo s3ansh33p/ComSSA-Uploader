@@ -105,6 +105,8 @@
             // use xml http request instead of fetch and log progress
             const request = new XMLHttpRequest();
             request.open("POST", "/upload");
+            // set header to multi-part form data
+            request.setRequestHeader("Content-Type", "multipart/form-data");
             request.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     document.getElementById('stat').innerHTML = `<span>Success</span>`;
