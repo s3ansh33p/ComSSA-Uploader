@@ -1,0 +1,224 @@
+body {
+    background-color: #171f69;
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* files */
+#file-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    border-bottom: 1px solid #f04e23;
+    cursor: pointer;
+}
+
+#file {
+    text-align: center;
+}
+
+/* Form styling */
+#main-text {
+    padding-bottom: 0.5rem;
+    font-size: 3rem;
+}
+
+#username {
+    height: 1.5rem;
+}
+
+#stat {
+    font-size: 2rem;
+    padding: 5px 0;
+    margin-bottom: 0.5rem;
+}
+
+#link > p {
+    font-size: 1rem;
+}
+
+#link > form {
+    padding: 0.5rem 0;
+}
+
+/* layout */
+.container {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 2rem);
+    height: 100vh;
+    margin: 1rem;
+    align-items: center;
+}
+
+.container > div {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.file-upload {
+    margin-bottom: 3rem;
+    margin-top: 2rem;
+}
+
+#upload {
+    margin-left: 0.25rem;
+}
+
+.auth {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+}
+
+label {
+    font-size: 1.5rem;
+}
+
+.auth-btn {
+    border: 2px solid black;
+    border-radius: 50px;
+    background-color: #f04e23;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.5rem;
+    width: 50%;
+    margin: auto;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+#err {
+    color: red;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+a {
+    cursor: pointer;
+    color: white;
+}
+
+a:hover {
+    color: #f04e23;
+}
+
+.folder {
+    margin-top: 1rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+.form-group > button {
+    border: none;
+}
+
+/* panel styling */
+#stat {
+    text-align: center;
+}
+
+/* link styling */
+#link {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.links {
+    background: #1f2a8f;
+    padding: 0.5rem;
+    margin: 0.25rem 0 0.5rem 0;
+}
+
+.linksfile {
+    /* disabled text */
+    color: #b3b3b3;
+}
+
+.links-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.container-a {
+    margin: 1rem;
+}
+
+input::file-selector-button {
+    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    background-color: #f04e23;
+    border: none;
+    color: white;
+    font-weight: 600;
+}
+
+.button-styling {
+    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    background-color: #f04e23;
+    border: none;
+    color: white;
+    font-weight: 600;
+}
+
+.panel-page {
+    display: flex;
+    justify-content: center;
+}
+
+#username, #link-input {
+    font-size: 1rem;
+    padding: 1rem;
+    height: 2rem;
+    border: none;
+    border-radius: 1rem;
+}
+
+#link-input {
+    margin-right: 2.25rem;
+}
+
+form {
+    display: flex;
+}
+
+.timer-div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#form {
+    flex-direction: column;
+}

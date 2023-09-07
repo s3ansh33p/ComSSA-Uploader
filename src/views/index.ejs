@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <link rel="shortcut icon" href="https://hackathon.comssa.org.au/files/aa4dce44253311d487e3bfe9304a7d35/android-chrome-512x512.png" type="image/x-icon" />
+    <meta name="author" content="Sean" />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>Home | Hackathon Submission</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,900" rel="stylesheet">
+    <link rel="stylesheet" href="./public/css/styles.css">
+    <!-- Bootstrap -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous"> -->
+</head>
+
+<body class="auth">
+    <!-- error message -->
+    <span id="err"></span>
+    <!-- login form -->
+    <form id="form" onsubmit="postAuth();">
+        <!-- username -->
+        <div class="form-group">
+            <label id="main-text" for="username">Team Name</label>
+            <input type="text" name="username" id="username" placeholder="Team Name" required>
+        </div>
+        <!-- submit button -->
+        <div class="form-group">
+            <button type="button" onclick="postAuth();" class="auth-btn">Login</button>
+        </div>
+    </form>
+
+    <script>
+        async function postAuth() {
+            // post form data
+            const response = await fetch('/login', {
+                method: 'POST',
+                body: JSON.stringify({
+                    username: document.querySelector('#username').value,
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            // get response
+            const data = await response.json();
+            // check response
+            if (data.success) {
+                // redirect to panel
+                window.location.href = '/panel';
+            } else {
+                // display error
+                document.querySelector('#err').innerHTML = data.message;
+            }
+            return false;
+        }
+
+        // listener on the #username element to submit form on enter
+        document.querySelector('#username').addEventListener('keyup', function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                document.querySelector('#form').submit();
+            }
+        });
+    </script>
+
+</body>
+
+</html>

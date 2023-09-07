@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <link rel="shortcut icon" href="https://hackathon.comssa.org.au/files/aa4dce44253311d487e3bfe9304a7d35/android-chrome-512x512.png" type="image/x-icon" />
+    <meta name="author" content="Sean" />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>Admin | Hackathon Submission</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,900" rel="stylesheet">
+    <link rel="stylesheet" href="./public/css/styles.css">
+</head>
+
+<body>
+    <div class="container-a">
+        <div>
+            <div id="file-list">
+                <!-- list of files -->
+            </div>
+        </div>
+    </div>
+    <script>  
+
+
+        async function getFiles() {
+            let txtQueue = [];
+            let folderDivs = [];
+            await fetch('/list')
+                .then(response => response.json())
+                .then(data => {
+                    const fileList = document.getElementById('file-list');
+                    fileList.innerHTML = '';
+                    data.tree.forEach(file => {
+                        // split by /
+                        let folder = file.split('/')[0];
+                        file = file.split('/')[1];
+                        let folderDiv;
+                        // check if folder is already in folderDivs
+                        if (!folderDivs.includes(folder)) {
+                            // add folder to folderDivs
+                            folderDivs.push(folder);
+                            // create folder div
+                            const folderDiv = document.createElement('div');
+                            folderDiv.classList.add('folder');
+                            // folder title el
+                            const folderTitle = document.createElement('h3');
+                            folderTitle.innerText = folder;
+                            folderDiv.appendChild(folderTitle);
+                            folderDiv.id = folder;
+                            fileList.appendChild(folderDiv);
+                        }
+                        // create file div
+                        const div = document.createElement('div');
+                        const a = document.createElement('a');
+                        a.innerText = file;
+                        // set onclick to download file
+                        a.onclick = () => dl(folder + '/' + file);
+
+
+                        // check if the filename is links.txt
+                        if (file === 'alinks.txt') {
+                            // queue request to read contents of links.txt
+                            div.id = 'links-' + folder;
+                            txtQueue.push(folder + '/' + file);
+                            a.classList.add('linksfile');
+                        }
+                        div.appendChild(a);
+
+                        // find the folder to append to
+                        document.getElementById(folder).appendChild(div);
+                    });
+                });
+                loadTxtFiles(txtQueue);
+        }
+
+        async function loadTxtFiles(txtQueue) {
+            // loop through txtQueue and create promise array
+            let promises = [];
+            for (let i = 0; i < txtQueue.length; i++) {
+                promises.push(fetch('/read?target=' + txtQueue[i])
+                    .then(response => response.text())
+                    .then(data => {
+                        // create div for links
+                        const div = document.createElement('div');
+                        div.classList.add('links');
+                        // create ul
+                        const ul = document.createElement('ul');
+                        // add 2nd div to ul
+                        const div2 = document.createElement('div');
+                        div2.innerText = 'Links';
+                        div2.classList.add('links-title');
+                        ul.appendChild(div2);
+                        // split by new line
+                        textContent = (JSON.parse(data).text).split('\n');
+                        // remove last if blank
+                        if (textContent[textContent.length - 1] === '') {
+                            textContent.pop();
+                        }
+                        textContent.forEach(link => {
+                            // create li
+                            const li = document.createElement('div');
+                            // create a
+                            const a = document.createElement('a');
+                            a.innerText = link;
+                            a.href = link;
+                            a.target = '_blank';
+                            li.appendChild(a);
+                            ul.appendChild(li);
+                        });
+                        div.appendChild(ul);
+                        // append to folder
+                        document.getElementById("links-"+txtQueue[i].split('/')[0]).appendChild(div);
+                    }));
+                // wait for all promises to resolve
+                await Promise.all(promises);
+            }
+        }
+
+        getFiles();
+
+        function dl(fp) {
+            const target = fp.split('/').pop();
+            downloadWithProgress('/download?target=' + fp, target);
+        }
+
+        function downloadWithProgress(url, fileName) {
+            const startTime = new Date().getTime();
+
+            request = new XMLHttpRequest();
+
+            request.responseType = "blob";
+            request.open("get", url, true);
+            request.send(); 
+
+            request.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    const url = window.URL.createObjectURL(this.response);
+
+                    const anchor = document.createElement("a");
+                    anchor.href = url;
+                    anchor.download = fileName;
+                    document.body.appendChild(anchor);
+                    anchor.click();
+                } else if (this.readyState == 4 && this.status != 200) {
+                    alert("Error: " + this.status)
+                }
+            };
+
+            request.onprogress = function (e) {
+                const percent_complete = Math.floor((e.loaded / e.total) * 100);
+
+                const duration = (new Date().getTime() - startTime) / 1000;
+                const bps = e.loaded / duration;
+
+                const kbps = Math.floor(bps / 1024);
+
+                const time = Math.floor((e.total - e.loaded) / bps);
+                const seconds = time % 60;
+                const minutes = Math.floor(time / 60);
+                console.log(`${percent_complete}% (${kbps}kbps) ${minutes}m ${seconds}s`);
+            }
+        }
+
+    </script>
+
+
+</body>
+
+</html>

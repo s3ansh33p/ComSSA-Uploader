@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <link rel="shortcut icon"
+        href="https://hackathon.comssa.org.au/files/aa4dce44253311d487e3bfe9304a7d35/android-chrome-512x512.png"
+        type="image/x-icon" />
+    <meta name="author" content="Sean" />
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>Panel | Hackathon Submission</title>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,900" rel="stylesheet">
+    <link rel="stylesheet" href="./public/css/styles.css">
+    <!-- Bootstrap -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous"> -->
+</head>
+
+<body class="panel-page">
+    <div class="container" style="margin: 0;">
+        <div>
+            <div class="timer-div">
+                <p id="stat">Upload submission</p>
+                <span>You have <span id="time"></span> remaining.</span>
+                <form class="file-upload" enctype="multipart/form-data" onsubmit="return uploadFiles()">
+                    <!-- <input type="file" name="files" id="file" webkitdirectory mozdirectory /> -->
+                    <input class="" type="file" name="files" id="file" />
+                    <input class="button-styling" id="upload" type="submit" value="Upload" />
+                </form>
+            </div>
+
+            <div id="link">
+                <p>Alternatively, enter a link to your presentation here:</p>
+                <form onsubmit="return uploadLink()">
+                    <input type="text" name="link" id="link-input" placeholder="Enter link" />
+                    <input class="button-styling" type="submit" value="Upload" />
+                </form>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        const file = document.getElementById('file');
+        file.addEventListener('change', (e) => {
+            // clear file list
+            // document.getElementById('file-list').innerHTML = '';
+            for (let i = 0; i < file.files.length; i++) {
+                // check file size
+                if (file.files[i].size > 1000000 * 500) {
+                    console.log(file.files[i].name + ' is too large (> 500MB)');
+                    continue;
+                }
+                const path = file.files[i].webkitRelativePath;
+                // remove first folder
+                const slicedPath = path.split('/').slice(1).join('/');
+                const fileName = path.split('/').pop();
+                const fileDiv = document.createElement('div');
+                // add class
+                fileDiv.classList.add('file-item');
+                fileDiv.innerHTML = slicedPath;
+                // document.getElementById('file-list').appendChild(fileDiv);
+            }
+        });
+
+        function uploadLink() {
+            const link = document.getElementById('link-input').value;
+            document.getElementById('stat').innerHTML = `Uploading...`;
+            fetch('/link?u=' + link)
+                .then(res => res.json())
+                .then(res => {
+                    console.log(res);
+                    document.getElementById('stat').innerHTML = `<span>Success</span>`;
+                    // check status code for error
+                    if (res.status != 200) {
+                        document.getElementById('stat').innerHTML = `<span>${res.message}</span>`;
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    document.getElementById('stat').innerHTML = `<span>${err}</span>`;
+                });
+            return false;
+        }
+
+        function uploadFiles() {
+            const formData = new FormData();
+            for (let i = 0; i < file.files.length; i++) {
+                formData.append('files', file.files[i]);
+            }
+            document.getElementById('stat').innerHTML = `Uploading...`;
+            // fetch('/upload', {
+            //     method: 'POST',
+            //     body: formData
+            // }).then(res => res.json())
+            // .then(res => {
+            //     console.log(res);
+            //     document.getElementById('stat').innerHTML = `<span>Success</span>`;
+            // })
+            // .catch(err => {
+            //     console.log(err);
+            // });
+            // use xml http request instead of fetch and log progress
+            const request = new XMLHttpRequest();
+            request.open("POST", "/upload");
+            request.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById('stat').innerHTML = `<span>Success</span>`;
+                } else if (this.readyState == 4 && this.status != 200) {
+                    // log error response message
+                    const error = JSON.parse(this.response).message;
+                    document.getElementById('stat').innerHTML = `<span>${error}</span>`;
+                }
+            };
+            request.upload.onprogress = function (e) {
+                const percent_complete = Math.floor((e.loaded / e.total) * 100);
+                document.getElementById('stat').innerHTML = `Uploading... ${percent_complete}%`;
+            };
+            request.send(formData);
+
+
+            return false;
+        }
+
+        // Set the date we're counting down to
+        var countDownDate = 1694317500000;
+
+        function doUpdate() {
+            // Get today's date and time
+            var now = new Date().getTime();
+
+            // Find the distance between now and the count down date
+            var distance = countDownDate - now;
+
+            let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+
+            // Time calculations for days, hours, minutes and seconds
+            var hours = Math.floor(
+                (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+            );
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Display the result in the element with id="time"
+            document.getElementById("time").innerHTML =
+                days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+
+            // If the count down is finished, write some text
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("time").innerHTML = "no time";
+                document.getElementsByClassName('file-upload')[0].remove();
+                document.getElementById('link').remove();
+
+            }
+        }
+
+        // Update the count down every 1 second
+        var x = setInterval(function () {
+            doUpdate()
+        }, 1000);
+        doUpdate(); // first load
+
+    </script>
+
+
+</body>
+
+</html>
