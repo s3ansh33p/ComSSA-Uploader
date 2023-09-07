@@ -42,6 +42,14 @@ const storage = multer.diskStorage({
     }
 });
 
+const uploadHandler = multer({
+    preservePath: true,
+    storage: storage,
+    limits: {
+        fileSize: 1024 * 1024 * 500 // 500MB
+    }
+});
+
 async function authGuard(req, res, next) {
     if (req.session.user) {
         next();
@@ -155,7 +163,48 @@ class App {
         });
 
         // upload
-        this.app.post('/upload', authGuard, async function (req, res) {
+        // this.app.post('/upload', authGuard, async function (req, res) {
+        //     // check if submission end time is reached
+        //     const endTime = 1694317500000;
+        //     if (Date.now() > endTime) {
+        //         req.setTimeout(1);
+        //         return res.status(400).json({
+        //             message: 'Submission time has ended',
+        //             success: false
+        //         });
+        //     }
+        //     req.setTimeout(1000 * 60); // 1 minute
+        //     // auth check
+        //     // clear old files
+        //     let user = req.session.user;
+        //     // await wipeDir(path.join(process.cwd(), 'uploads', user));
+
+        //     const upload = multer({
+        //         preservePath: true,
+        //         storage: storage,
+        //         limits: {
+        //             fileSize: 1024 * 1024 * 500 // 500MB
+        //         }
+        //     }).array('files', 100); // 100 files max at a time
+        //     await upload(req, res, async function(err) {
+        //         if (err) {
+        //             // console.log(err)
+        //             return res.status(400).json({
+        //                 message: err.message,
+        //                 success: false
+        //             });
+        //         }
+        //     });
+
+        //     // success upload
+        //     res.status(200).json({
+        //         message: 'Upload successful',
+        //         success: true
+        //     });
+        // });
+
+        // upload but use multi-part form data with multer
+        this.app.post('/upload', authGuard, uploadHandler.any(), async function (req, res) {
             // check if submission end time is reached
             const endTime = 1694317500000;
             if (Date.now() > endTime) {
@@ -171,28 +220,12 @@ class App {
             let user = req.session.user;
             // await wipeDir(path.join(process.cwd(), 'uploads', user));
 
-            const upload = multer({
-                preservePath: true,
-                storage: storage,
-                limits: {
-                    fileSize: 1024 * 1024 * 500 // 500MB
-                }
-            }).array('files', 100); // 100 files max at a time
-            await upload(req, res, async function(err) {
-                if (err) {
-                    // console.log(err)
-                    return res.status(400).json({
-                        message: err.message,
-                        success: false
-                    });
-                }
-            });
-
             // success upload
             res.status(200).json({
                 message: 'Upload successful',
                 success: true
             });
+
         });
 
         this.app.get('/link', authGuard, async function (req, res) {

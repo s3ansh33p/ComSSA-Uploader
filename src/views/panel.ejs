@@ -91,37 +91,27 @@
                 formData.append('files', file.files[i]);
             }
             document.getElementById('stat').innerHTML = `Uploading...`;
-            // fetch('/upload', {
-            //     method: 'POST',
-            //     body: formData
-            // }).then(res => res.json())
-            // .then(res => {
-            //     console.log(res);
-            //     document.getElementById('stat').innerHTML = `<span>Success</span>`;
-            // })
-            // .catch(err => {
-            //     console.log(err);
-            // });
-            // use xml http request instead of fetch and log progress
-            const request = new XMLHttpRequest();
-            request.open("POST", "/upload");
-            // set header to multi-part form data
-            request.setRequestHeader("Content-Type", "multipart/form-data");
-            request.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
-                    document.getElementById('stat').innerHTML = `<span>Success</span>`;
-                } else if (this.readyState == 4 && this.status != 200) {
-                    // log error response message
-                    const error = JSON.parse(this.response).message;
-                    document.getElementById('stat').innerHTML = `<span>${error}</span>`;
-                }
-            };
-            request.upload.onprogress = function (e) {
-                const percent_complete = Math.floor((e.loaded / e.total) * 100);
-                document.getElementById('stat').innerHTML = `Uploading... ${percent_complete}%`;
-            };
-            request.send(formData);
+            window.uploadProg = 0;
+            // set interval to update progress in seconds
+            window.uploadInterval = setInterval(() => {
+                document.getElementById('stat').innerHTML = `Uploading... ${window.uploadProg++}`;
+            }, 1000);
 
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            }).then(res => res.json())
+            .then(res => {
+                console.log(res);
+                document.getElementById('stat').innerHTML = `<span>Success</span>`;
+                // clear timeout
+                clearInterval(window.uploadInterval);
+            })
+            .catch(err => {
+                console.log(err);
+                // clear timeout
+                clearInterval(window.uploadInterval);
+            });
 
             return false;
         }
