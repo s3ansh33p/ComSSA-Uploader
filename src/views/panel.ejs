@@ -49,8 +49,10 @@
             // document.getElementById('file-list').innerHTML = '';
             for (let i = 0; i < file.files.length; i++) {
                 // check file size
-                if (file.files[i].size > 1000000 * 500) {
-                    console.log(file.files[i].name + ' is too large (> 500MB)');
+                if (file.files[i].size > 1000000 * 100) {
+                    console.log(file.files[i].name + ' is too large (> 100MB)');
+                    // alert
+                    alert(file.files[i].name + ' is too large (> 100MB)');
                     continue;
                 }
                 const path = file.files[i].webkitRelativePath;
